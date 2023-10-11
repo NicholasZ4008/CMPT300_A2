@@ -10,3 +10,9 @@ socket_listen.c:
         comment out line 49
         Uncomment lines: 53, 57,59,60,64-72
         Rerun the program and enter a numerical value into the netcat terminal
+
+read_example.c compile:
+gcc -o read_example read_example.c && ./read_example example.txt
+
+write_example.c compile:
+gcc -o write_example write_example.c && ./write_example output.txt "Hello, World!"
