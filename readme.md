@@ -16,3 +16,9 @@ gcc -o read_example read_example.c && ./read_example example.txt
 
 write_example.c compile:
 gcc -o write_example write_example.c && ./write_example output.txt "Hello, World!"
+
+socket_send.c:
+gcc -o socket_send socket_send.c
+
+socket_listen.c:
+gcc -o socket_listen socket_listen.c

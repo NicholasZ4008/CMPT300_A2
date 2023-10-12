@@ -1,32 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <netdb.h>
-#include <string.h> //For strncmp()
-#include <unistd.h> // For close()
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <arpa/inet.h>
 
-#define MSG_MAX_LEN 1024
 #define PORT 22110
-#define LOCAL_HOST "142.58.15.166"
+#define MSG_MAX_LEN 1024
+#define LOCAL_HOST "127.0.0.1"
 
-int main(){
-    printf("Net listen test on UDP port: %d\n\n", PORT);
-    printf("Connect using: ");
-    printf("netcat -u %s %d\n", LOCAL_HOST, PORT);
+int main() {
+    int sendfd;
+    struct sockaddr_in server_addr;
+    char buffer[MSG_MAX_LEN] = "Hello, Server!";//this will be sent
 
-    printf("input something to send:");
-    int send=0;
-    scanf("%d", &send);
+    // Create socket
+    sendfd = socket(AF_INET, SOCK_DGRAM, 0);
 
-    struct sockaddr_in sin; //MUST spell sockaddr correctly
-    memset(&sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = htonl(INADDR_ANY);
-    sin.sin_port = htons(PORT); 
+    // Define server address (in this case, localhost)
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    //Create UDP socket
-    int socketDescriptor = socket(PF_INET, SOCK_DGRAM, 0);
+    // Send data
+    sendto(sendfd, buffer, strlen(buffer), 0, (struct sockaddr*)&server_addr, sizeof(server_addr));
 
-    //Bind socket to port specified
-    bind(socketDescriptor, (struct sockaddr*) &sin, sizeof(sin));
+    printf("Message sent to server.\n");
 
+    close(sendfd);
+    return 0;
 }
