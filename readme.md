@@ -22,3 +22,6 @@ gcc -o socket_send socket_send.c
 
 socket_listen.c:
 gcc -o socket_listen socket_listen.c
+
+pthread_example:
+gcc -o pthread_example pthread_example.c -lpthread
