@@ -17,12 +17,12 @@ void* send_thread(void* arg) {
 
 void* receive_thread(void* arg) {
     // Potential Loop to keep the thread alive for continuous listening
-    while (1) {
-        // Call your receive socket function
-        socket_receive( /* Parameters as per your function */ );
 
-        // Optional: Implement a mechanism to process or display the received data
-        // ...
-    }
+    // Call your receive socket function
+    socket_receive( /* Parameters as per your function */ );
+
+    // Optional: Implement a mechanism to process or display the received data
+    // ...
+    
     return NULL;
 }
