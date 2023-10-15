@@ -36,7 +36,6 @@ void* send_thread_func(void* threadarg) {
     
     while(1) { 
         socket_send(ip_address, port, message);
-        sleep(1); // Prevents spamming messages non-stop
     }
     
     return NULL;

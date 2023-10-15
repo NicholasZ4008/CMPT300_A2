@@ -8,14 +8,20 @@ int main(){
     int keyboardret, screenret, sendret, receiveret;
 
     pThreadD threadArgs;
+    threadArgs.sharedList = List_create();
 
-    keyboardret = pthread_create(&keyboard_thread, NULL, keyboard_input_func, );
-
+    //thread creation 
+    keyboardret = pthread_create(&keyboard_thread, NULL, keyboard_input_func, &threadArgs);
     // screenret = pthread_create(&keyboard_thread, NULL, screen_output_func, );
     // sendret = pthread_create(&keyboard_thread, NULL, send_thread_func, );
     // receiveret = pthread_create(&keyboard_thread, NULL, receive_thread_func, );
 
 
-    //Independent thread creation
+    //joins
+    pthread_join(keyboard_thread, NULL);
+    pthread_join(screen_thread, NULL);
+    pthread_join(send_thread, NULL);
+    pthread_join(receive_thread, NULL);
 
+    exit(0);
 }
