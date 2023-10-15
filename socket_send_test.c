@@ -9,7 +9,7 @@
 int main(){
     char message[MSG_MAX_LEN] = "Hi Server";
 
-    socket_send(LOCAL_HOST,PORT,message);
+    socket_send(REMOTE_IP,PORT,message);
 
     printf("\nMessage Sent\n");
 }

@@ -3,7 +3,7 @@
 int socket_send(const char* ip_address, int port, const char* message) {
     int sendfd;
     struct sockaddr_in server_addr;
-
+    
     // Create socket
     sendfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sendfd < 0) {
@@ -43,13 +43,13 @@ int socket_receive(int port){
     struct sockaddr_in sin; 
     memset(&sin, 0, sizeof(sin));
 
-    //setting up the sock address
+    //setting up the socket address
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = htonl(INADDR_ANY);
     sin.sin_port = htons(port); 
 
     //Create UDP socket
-    int socketDescriptor = socket(PF_INET, SOCK_DGRAM, 0);
+    int socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0);
     if (socketDescriptor < 0) {
         perror("Error creating socket");
         return -1;
