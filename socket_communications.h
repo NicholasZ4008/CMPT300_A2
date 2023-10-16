@@ -19,6 +19,6 @@ int socket_send(const char* ip_address, int port, const char* message);
 
 // Function to receive messages on a specified port.
 // Returns 0 on success, and -1 on failure.
-int socket_receive(int port);
+char* socket_receive(int port);
 
 #endif //SOCKET_COMMUNICATIONS_H

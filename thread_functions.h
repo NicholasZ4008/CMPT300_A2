@@ -13,7 +13,7 @@ struct ThreadInfo_S{
     List* sharedList;
     const char* ip_address;
     int port;
-    const char* message;
+    char* message;
 };
 
 void* keyboard_input_func(void* threadarg);
