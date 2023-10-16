@@ -1,6 +1,34 @@
 #include "socket_communications.h"
 
-int socket_send(const char* ip_address, int port, const char* message) {
+//converts hostname to an ip
+//result is stored in ip
+int hostname_to_ip(const char *hostname, char *ip)
+{
+    struct hostent *he;
+    struct in_addr **addr_list;
+
+    if ((he = gethostbyname(hostname)) == NULL) 
+    {
+        // gethostbyname failed
+        herror("gethostbyname");
+        return 1;
+    }
+
+    addr_list = (struct in_addr **) he->h_addr_list;
+
+    for(int i = 0; addr_list[i] != NULL; i++) 
+    {
+        //Return the first one
+        strcpy(ip, inet_ntoa(*addr_list[i]));
+        return 0;
+    }
+    
+    return 1;
+}
+
+
+//socket sends messages to specified ip address and port.
+int socket_send(const char* dest_ip, int dest_port, const char* message) {
     int sendfd;
     struct sockaddr_in server_addr;
     
@@ -13,8 +41,8 @@ int socket_send(const char* ip_address, int port, const char* message) {
 
     // Define server address
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(port);
-    server_addr.sin_addr.s_addr = inet_addr(ip_address);
+    server_addr.sin_port = htonl(dest_port);//make sure endian is same
+    server_addr.sin_addr.s_addr = inet_addr(dest_ip);
 
     // Send data
     int send_status = sendto(sendfd, message, strlen(message), 0, 
@@ -36,15 +64,16 @@ int socket_send(const char* ip_address, int port, const char* message) {
     return 0; // Indicating success
 }
 
-char* socket_receive(int port){
-    printf("Net listen test on UDP port: %d\n\n", port);
+//opens receive socket at host_port
+char* socket_receive(int host_port){
+    printf("Net listen test on UDP port: %d\n\n", host_port);
 
     struct sockaddr_in sin; 
     memset(&sin, 0, sizeof(sin));
 
     sin.sin_family = AF_INET;
     sin.sin_addr.s_addr = htonl(INADDR_ANY);
-    sin.sin_port = htons(port); 
+    sin.sin_port = htons(host_port); 
 
     int socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0);
     if (socketDescriptor < 0) {

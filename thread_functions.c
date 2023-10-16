@@ -33,7 +33,7 @@ void* send_thread_func(void* threadarg) {
     List* sendList = args->sharedList;
     const char* ip_address = args->ip_address;
     int port = args->port;
-    char* message = args->message;
+    char* message;
     
     while(1) { 
         //pick message from list
@@ -58,6 +58,7 @@ void* receive_thread_func(void* threadarg) {
     List* receiveList = args->sharedList;
     int port = args->port;
     char* message;
+
     while(1){
         //retreive message with receive_socket
         message = socket_receive(port);
@@ -81,7 +82,7 @@ void* receive_thread_func(void* threadarg) {
 void* screen_output_func(void* threadarg){
     pThreadD* args = (pThreadD*) threadarg;
     List* receiveList = args->sharedList;
-    char* message = args->message;
+    char* message;
 
     while(1){
         //pick messages from list

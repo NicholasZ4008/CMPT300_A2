@@ -13,11 +13,15 @@
 #include <netdb.h>
 #include "constants.h"
 
-// Function to send a message to a specified IP and port.
+//converts machine name to an ip address
+//returns 0 on success, 1 if there's an error 
+int hostname_to_ip(const char *hostname , char *ip);
+
+// Function to send a message to a remote IP and port.
 // Returns 0 on success, and -1 on failure.
 int socket_send(const char* ip_address, int port, const char* message);
 
-// Function to receive messages on a specified port.
+// Function to receive messages on a specified port(should be for host port).
 // Returns 0 on success, and -1 on failure.
 char* socket_receive(int port);
 

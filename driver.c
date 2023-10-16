@@ -3,18 +3,47 @@
 #include "constants.h"
 
 
-int main(){
+int main(int argc, char* argv[]){
+
+    //make sure there are at least 4 arguments
+    if (argc != 4) {
+        fprintf(stderr, "Usage: %s [my port number] [remote machine name] [remote port number]\n", argv[0]);
+        exit(1);
+    }
+
     pthread_t keyboard_thread, screen_thread, send_thread, receive_thread;
     int keyboardret, screenret, sendret, receiveret;
 
-    pThreadD threadArgs;
-    threadArgs.sharedList = List_create();
+    //input values into myPort and remotePort through the command-line
 
-    //thread creation 
-    keyboardret = pthread_create(&keyboard_thread, NULL, keyboard_input_func, &threadArgs);
-    // screenret = pthread_create(&keyboard_thread, NULL, screen_output_func, );
-    // sendret = pthread_create(&keyboard_thread, NULL, send_thread_func, );
-    // receiveret = pthread_create(&keyboard_thread, NULL, receive_thread_func, );
+    int myPort = atoi(argv[1]);
+    char* remoteMachineName = argv[2];
+    int remotePort = atoi(argv[3]);
+
+    //translate cpu_name (from command-line) to ip and store in remote_ip 
+    char* remote_ip;
+    hostname_to_ip(remoteMachineName, remote_ip);
+
+    //initializing output struct
+    pThreadD outputArgs;
+    outputArgs.sharedList = List_create();
+    outputArgs.ip_address = remote_ip;
+    outputArgs.port = remotePort;
+
+
+    //initializing input struct
+    pThreadD inputArgs;
+    inputArgs.sharedList = List_create();
+    inputArgs.port = myPort;
+
+
+    //"output" threads
+    keyboardret = pthread_create(&keyboard_thread, NULL, keyboard_input_func, &outputArgs);
+    screenret = pthread_create(&keyboard_thread, NULL, screen_output_func, &outputArgs);
+
+    //"input" threads
+    sendret = pthread_create(&keyboard_thread, NULL, send_thread_func, &inputArgs);
+    receiveret = pthread_create(&keyboard_thread, NULL, receive_thread_func, &inputArgs);
 
 
     //joins
