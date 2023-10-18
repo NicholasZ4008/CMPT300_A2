@@ -93,6 +93,7 @@ void* screen_output_func(void* threadarg){
             sleep(1);//wait before checking again (avoid busy-wait)
             continue;
         }
+        
         //write on console
         printf("%s\n", message);
         free(message);

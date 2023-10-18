@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
 
     //translate cpu_name (from command-line) to ip and store in remote_ip 
     char* remote_ip;
-    hostname_to_ip(remoteMachineName, remote_ip);
+    hostname_to_ip(remoteMachineName, remote_ip); //new ip address stored in remote_ip
 
     //initializing output struct
     pThreadD outputArgs;
@@ -30,12 +30,10 @@ int main(int argc, char* argv[]){
     outputArgs.ip_address = remote_ip;
     outputArgs.port = remotePort;
 
-
     //initializing input struct
     pThreadD inputArgs;
     inputArgs.sharedList = List_create();
     inputArgs.port = myPort;
-
 
     //"output" threads
     keyboardret = pthread_create(&keyboard_thread, NULL, keyboard_input_func, &outputArgs);
@@ -44,7 +42,6 @@ int main(int argc, char* argv[]){
     //"input" threads
     sendret = pthread_create(&keyboard_thread, NULL, send_thread_func, &inputArgs);
     receiveret = pthread_create(&keyboard_thread, NULL, receive_thread_func, &inputArgs);
-
 
     //joins
     pthread_join(keyboard_thread, NULL);
