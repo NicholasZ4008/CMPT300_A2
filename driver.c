@@ -25,23 +25,25 @@ int main(int argc, char* argv[]){
     hostname_to_ip(remoteMachineName, remote_ip); //new ip address stored in remote_ip
 
     //initializing output struct
+    //Output shared between keyboard and send
     pThreadD outputArgs;
     outputArgs.sharedList = List_create();
     outputArgs.ip_address = remote_ip;
     outputArgs.port = remotePort;
 
     //initializing input struct
+    //Input shared between screen and receive
     pThreadD inputArgs;
     inputArgs.sharedList = List_create();
     inputArgs.port = myPort;
 
     //"output" threads
     keyboardret = pthread_create(&keyboard_thread, NULL, keyboard_input_func, &outputArgs);
-    screenret = pthread_create(&keyboard_thread, NULL, screen_output_func, &outputArgs);
+    sendret = pthread_create(&send_thread, NULL, send_thread_func, &outputArgs);
 
     //"input" threads
-    sendret = pthread_create(&keyboard_thread, NULL, send_thread_func, &inputArgs);
-    receiveret = pthread_create(&keyboard_thread, NULL, receive_thread_func, &inputArgs);
+    screenret = pthread_create(&screen_thread, NULL, screen_output_func, &inputArgs);
+    receiveret = pthread_create(&receive_thread, NULL, receive_thread_func, &inputArgs);
 
     //joins
     pthread_join(keyboard_thread, NULL);
