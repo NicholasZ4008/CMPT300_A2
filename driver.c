@@ -1,6 +1,7 @@
 #include "thread_functions.h"
 #include "socket_communications.h"
 #include "constants.h"
+#include "LinkedList/list.h"
 
 
 int main(int argc, char* argv[]){
@@ -21,7 +22,7 @@ int main(int argc, char* argv[]){
     int remotePort = atoi(argv[3]);
 
     //translate cpu_name (from command-line) to ip and store in remote_ip 
-    char* remote_ip;
+    char remote_ip[100];
     hostname_to_ip(remoteMachineName, remote_ip);
 
     //initializing output struct
