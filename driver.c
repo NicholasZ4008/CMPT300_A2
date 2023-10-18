@@ -1,6 +1,7 @@
 #include "thread_functions.h"
 #include "socket_communications.h"
 #include "constants.h"
+#include "LinkedList/list.h"
 
 
 int main(int argc, char* argv[]){
@@ -21,8 +22,8 @@ int main(int argc, char* argv[]){
     int remotePort = atoi(argv[3]);
 
     //translate cpu_name (from command-line) to ip and store in remote_ip 
-    char* remote_ip;
-    hostname_to_ip(remoteMachineName, remote_ip); //new ip address stored in remote_ip
+    char remote_ip[100];
+    hostname_to_ip(remoteMachineName, remote_ip);
 
     //initializing output struct
     //Output shared between keyboard and send
@@ -31,11 +32,13 @@ int main(int argc, char* argv[]){
     outputArgs.ip_address = remote_ip;
     outputArgs.port = remotePort;
 
+
     //initializing input struct
     //Input shared between screen and receive
     pThreadD inputArgs;
     inputArgs.sharedList = List_create();
     inputArgs.port = myPort;
+
 
     //"output" threads
     keyboardret = pthread_create(&keyboard_thread, NULL, keyboard_input_func, &outputArgs);
@@ -45,6 +48,7 @@ int main(int argc, char* argv[]){
     screenret = pthread_create(&screen_thread, NULL, screen_output_func, &inputArgs);
     receiveret = pthread_create(&receive_thread, NULL, receive_thread_func, &inputArgs);
 
+
     //joins
     pthread_join(keyboard_thread, NULL);
     pthread_join(screen_thread, NULL);
@@ -53,3 +57,4 @@ int main(int argc, char* argv[]){
 
     exit(0);
 }
+
