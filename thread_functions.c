@@ -13,12 +13,16 @@ void* keyboard_input_func(void* threadarg){
 
     while(1) {
         printf("Type your message then press Enter\n");
+
         if(fgets(input, sizeof(input), stdin) != NULL) {
+            
             if(strcmp(input, "\n") == 0) {//if nothing is typed and enter is pressed, break loop
                 break;
             }
+            
             List_prepend(sendList, input);//insert entered item into input
-        } else {
+        } 
+        else {
             perror("Error reading input");
         }
     }

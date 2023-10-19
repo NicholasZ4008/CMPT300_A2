@@ -11,17 +11,12 @@ socket_listen.c:
         Uncomment lines: 53, 57,59,60,64-72
         Rerun the program and enter a numerical value into the netcat terminal
 
-read_example.c compile:
-gcc -o read_example read_example.c && ./read_example example.txt
-
-write_example.c compile:
-gcc -o write_example write_example.c && ./write_example output.txt "Hello, World!"
-
-socket_send.c:
-gcc -o socket_send socket_send.c
-
-socket_listen.c:
-gcc -o socket_listen socket_listen.c
-
 pthread_example:
 gcc -o pthread_example pthread_example.c -lpthread
+
+
+gcc -o receive_test socket_testing/socket_receive_test.c socket_communications.c
+
+gcc -o send_test socket_testing/socket_send_test.c socket_communications.c
+
+gcc -o s-talk driver.c socket_communications.c thread_functions.c LinkedList/list.c -lpthread

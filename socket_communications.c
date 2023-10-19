@@ -41,7 +41,7 @@ int socket_send(const char* dest_ip, int dest_port, const char* message) {
 
     // Define server address
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htonl(dest_port);//make sure endian is same
+    server_addr.sin_port = htons(dest_port);//make sure endian is same
     server_addr.sin_addr.s_addr = inet_addr(dest_ip);
 
     // Send data
@@ -65,6 +65,7 @@ int socket_send(const char* dest_ip, int dest_port, const char* message) {
 }
 
 //opens receive socket at host_port
+//isn't finished
 char* socket_receive(int host_port){
     printf("Net listen test on UDP port: %d\n\n", host_port);
 
@@ -118,5 +119,8 @@ char* socket_receive(int host_port){
     }
 
     strncpy(returnMsg, messageRx, terminateIdx + 1); // copy received message to dynamically allocated memory
+
+    printf("%c", *returnMsg);
+    
     return returnMsg;
 }

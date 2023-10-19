@@ -1,6 +1,6 @@
-#include "socket_communications.h"
-#include "constants.h"
+#include "../socket_communications.h"
+#include "../constants.h"
 
 int main(){
-    socket_receive(PORT);
+    socket_receive(22111);
 }

@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include "LinkedList/list.h"
 #include "constants.h"
 
 //converts machine name to an ip address

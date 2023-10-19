@@ -60,6 +60,7 @@
     "*html": "html",
     "stdio.h": "c",
     "netdb.h": "c",
-    "constants.h": "c"
+    "constants.h": "c",
+    "cstdio": "c"
   }
 }
