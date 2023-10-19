@@ -1,13 +1,12 @@
 #ifndef THREAD_FUNCTIONS_H
 #define THREAD_FUNCTIONS_H
 
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+// #include <pthread.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <unistd.h>
 #include "LinkedList/list.h"
-#include "constants.h"
-
+#include "socket_communications.h"
 typedef struct ThreadInfo_S pThreadD;
 struct ThreadInfo_S{
     List* sharedList;

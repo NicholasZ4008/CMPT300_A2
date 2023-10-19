@@ -1,10 +1,7 @@
 #include "thread_functions.h"
-#include "socket_communications.h"
-#include "LinkedList/list.h"
 
 //read from user input and insert into list
 void* keyboard_input_func(void* threadarg){
-
     //wrap threadarg with struct to pass in List
     pThreadD* args = (pThreadD*) threadarg;
     List* sendList = args->sharedList;
@@ -14,18 +11,23 @@ void* keyboard_input_func(void* threadarg){
     while(1) {
         printf("Type your message then press Enter\n");
 
-        if(fgets(input, sizeof(input), stdin) != NULL) {
-            
+        if(fgets(input, sizeof(input), stdin) != NULL) {            
             if(strcmp(input, "\n") == 0) {//if nothing is typed and enter is pressed, break loop
                 break;
             }
-            
+            if(strcmp(input, "!\n") == 0){
+                void* empty;
+                List_free(sendList, empty);
+                threads_shutdown();
+                break;
+            }
             List_prepend(sendList, input);//insert entered item into input
         } 
         else {
             perror("Error reading input");
         }
     }
+    printf("Exit keyboard thread");
     return NULL;
 }
 
@@ -50,9 +52,11 @@ void* send_thread_func(void* threadarg) {
             continue;
         }
 
+        printf("\nSending message to %s:%d\n", ip_address, port);
         //shoot message with socket_send
         socket_send(ip_address, port, message);
     }
+    printf("Exit send thread\n");
     return NULL;
 }
 
@@ -79,6 +83,7 @@ void* receive_thread_func(void* threadarg) {
             sleep(1);//avoid busy-wait
         }
     }
+    printf("exit recv thread\n");
     return NULL;
 }
 
@@ -102,5 +107,6 @@ void* screen_output_func(void* threadarg){
         printf("%s\n", message);
         free(message);
     }
+    printf("Exit screen output\n");
     return NULL;
 }

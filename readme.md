@@ -11,6 +11,12 @@ socket_listen.c:
         Uncomment lines: 53, 57,59,60,64-72
         Rerun the program and enter a numerical value into the netcat terminal
 
+
+*USE THIS TO RUN THE PROGRAM*
+gcc driver.c LinkedList/list.c 
+socket_communications.c thread_functions.c -lpthread -o test.out 
+
+
 pthread_example:
 gcc -o pthread_example pthread_example.c -lpthread
 
