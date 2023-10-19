@@ -119,8 +119,6 @@ char* socket_receive(int host_port){
     }
 
     strncpy(returnMsg, messageRx, terminateIdx + 1); // copy received message to dynamically allocated memory
-
-    printf("%c", *returnMsg);
     
     return returnMsg;
 }
