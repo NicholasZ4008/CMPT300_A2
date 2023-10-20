@@ -13,8 +13,7 @@ socket_listen.c:
 
 
 *USE THIS TO RUN THE PROGRAM*
-gcc driver.c LinkedList/list.c 
-socket_communications.c thread_functions.c -lpthread -o test.out 
+gcc driver.c LinkedList/list.c socket_communications.c thread_functions.c -lpthread -o test.out 
 
 
 pthread_example:

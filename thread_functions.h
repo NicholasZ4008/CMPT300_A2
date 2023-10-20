@@ -1,7 +1,7 @@
 #ifndef THREAD_FUNCTIONS_H
 #define THREAD_FUNCTIONS_H
 
-// #include <pthread.h>
+#include <pthread.h>
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include <unistd.h>

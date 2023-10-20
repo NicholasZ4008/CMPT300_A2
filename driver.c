@@ -4,26 +4,27 @@
 #include <pthread.h>
 static pthread_t screen_thread, receive_thread, keyboard_thread, send_thread;
 
-void threads_init(int port, int remotePort, char* remoteIp){
+void threads_init(int port, int remotePort, char* remoteIp, List* inputList, List* outputList){
     int screenret, receiveret;
     int keyboardret, sendret;
 
     //initializing input struct
     //Input shared between screen and receive
     pThreadD inputArgs;
-    inputArgs.sharedList = List_create();
+    inputArgs.sharedList = inputList;
     inputArgs.port = port;
-    //"input" threads
-    screenret = pthread_create(&screen_thread, NULL, screen_output_func, &inputArgs);
-    receiveret = pthread_create(&receive_thread, NULL, receive_thread_func, &inputArgs);
-
 
     //initializing output struct
     //Output shared between keyboard and send
     pThreadD outputArgs;
-    outputArgs.sharedList = List_create();
+    outputArgs.sharedList = outputList;
     outputArgs.ip_address = remoteIp;
     outputArgs.port = remotePort;
+
+    //"input" threads
+    screenret = pthread_create(&screen_thread, NULL, screen_output_func, &inputArgs);
+    receiveret = pthread_create(&receive_thread, NULL, receive_thread_func, &inputArgs);
+
     //"output" threads
     keyboardret = pthread_create(&keyboard_thread, NULL, keyboard_input_func, &outputArgs);
     sendret = pthread_create(&send_thread, NULL, send_thread_func, &outputArgs);
@@ -36,13 +37,18 @@ void threads_init(int port, int remotePort, char* remoteIp){
 
 }
 void threads_shutdown(){
-
     //Make threads stop working
     pthread_cancel(screen_thread);
     pthread_cancel(receive_thread);
     pthread_cancel(keyboard_thread);
     pthread_cancel(send_thread);
-    printf("\nThreads have been shutdown.\n Terminating program\n");
+    printf("\nThreads have been shutdown.\n");
+}
+
+void freeItem(void* pItem){
+    if(pItem != NULL){
+        free(pItem);
+    }
 }
 
 int main(int argc, char* argv[]){
@@ -64,7 +70,17 @@ int main(int argc, char* argv[]){
     hostname_to_ip(remoteMachineName, remote_ip); //new ip address stored in remote_ip
 
 
-    threads_init(myPort, remotePort, remote_ip);
+    List* inputList = List_create();
+    List* outputList = List_create();
+    FREE_FN funcPointer = &freeItem;
+
+    threads_init(myPort, remotePort, remote_ip, inputList, outputList);
+
+    printf("Finished closing all threads\n");
+
+    List_free(outputList, funcPointer);
+    List_free(inputList, funcPointer);
+    printf("Finished freeing the lists\n");
 
     exit(0);
 }
