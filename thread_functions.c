@@ -16,9 +16,11 @@ void* keyboard_input_func(void* threadarg){
 
         if(fgets(input, sizeof(input), stdin) != NULL) {            
             if(strcmp(input, "\n") == 0) {//if nothing is typed and enter is pressed, break loop
+                printf("Nothing typed\n");
                 break;
             }
             if(strcmp(input, "!\n") == 0){
+                printf("Exiting program\n");
                 pthread_mutex_lock(&sendListMutex);
                 void* empty;
                 pthread_mutex_unlock(&sendListMutex);
@@ -26,7 +28,7 @@ void* keyboard_input_func(void* threadarg){
                 break;
             }
             List_prepend(sendList, input);//insert entered item into input
-            printf("Added item to list\n");
+            // printf("Added: %s item to list\n", sendList->tail->item);
         } 
         else {
             perror("Error reading input");
@@ -48,11 +50,10 @@ void* send_thread_func(void* threadarg) {
     
     while(1) { 
         pthread_mutex_lock(&sendListMutex);
-        
         //pick message from list
-        List_last(sendList);//go to last item to retrieve latest message due to list_prepend
-        message = List_remove(sendList);//remove last item in LL(latest message) and store latest in message
-
+        // List_first(sendList);//go to last item to retrieve latest message due to list_prepend
+        // message = List_remove(sendList);//remove last item in LL(latest message) and store latest in message
+        message = List_trim(sendList);
         pthread_mutex_unlock(&sendListMutex);
 
         // If the list is empty (message is NULL)
@@ -61,7 +62,8 @@ void* send_thread_func(void* threadarg) {
             continue;
         }
 
-        printf("\nSending message to %s:%d\n", ip_address, port);
+        printf("Message: %s\n", message);
+        printf("Sending message to %s:%d\n", ip_address, port);
         //shoot message with socket_send
         socket_send(ip_address, port, message);
     }
