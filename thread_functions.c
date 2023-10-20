@@ -21,7 +21,6 @@ void* keyboard_input_func(void* threadarg){
             if(strcmp(input, "!\n") == 0){
                 pthread_mutex_lock(&sendListMutex);
                 void* empty;
-                List_free(sendList, empty);
                 pthread_mutex_unlock(&sendListMutex);
                 threads_shutdown();
                 break;
