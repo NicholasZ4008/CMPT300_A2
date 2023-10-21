@@ -62,8 +62,8 @@ void* send_thread_func(void* threadarg) {
             continue;
         }
 
-        printf("Message: %s\n", message);
-        printf("Sending message to %s:%d\n", ip_address, port);
+        // printf("Message: %s\n", message);
+        printf("Sending message \"%s \"to %s:%d\n",message, ip_address, port);
         //shoot message with socket_send
         socket_send(ip_address, port, message);
     }
@@ -85,6 +85,8 @@ void* receive_thread_func(void* threadarg) {
         if(message){//if message exists
             pthread_mutex_lock(&receriveListMutex);
             char * storedMessage = strdup(message);//help protect against unexpected overwrites
+
+            printf("Received message\n");
             //insert the message into the list
             List_prepend(receiveList, storedMessage);
             //free original message
@@ -107,8 +109,9 @@ void* screen_output_func(void* threadarg){
     while(1){
         pthread_mutex_lock(&receriveListMutex);
         //pick messages from list
-        List_last(receiveList);
-        message = List_remove(receiveList);
+        // List_last(receiveList);
+        // message = List_remove(receiveList);
+        message = List_trim(receiveList);
         pthread_mutex_unlock(&receriveListMutex);
 
         if(message == NULL) {
