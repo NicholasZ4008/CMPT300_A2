@@ -19,16 +19,18 @@ void* keyboard_input_func(void* threadarg){
                 printf("Nothing typed\n");
                 break;
             }
-            if(strcmp(input, "!\n") == 0){
-                printf("Exiting program\n");
-                pthread_mutex_lock(&sendListMutex);
-                void* empty;
-                pthread_mutex_unlock(&sendListMutex);
-                threads_shutdown();
-                break;
-            }
+            // if(strcmp(input, "!\n") == 0){
+            //     printf("Exiting program\n");
+            //     pthread_mutex_lock(&sendListMutex);
+            //     void* empty;
+            //     pthread_mutex_unlock(&sendListMutex);
+            //     threads_shutdown();
+            //     break;
+            // }
+            pthread_mutex_lock(&sendListMutex);
             List_prepend(sendList, input);//insert entered item into input
-            // printf("Added: %s item to list\n", sendList->tail->item);
+            pthread_mutex_unlock(&sendListMutex);
+
         } 
         else {
             perror("Error reading input");
@@ -55,15 +57,19 @@ void* send_thread_func(void* threadarg) {
         // message = List_remove(sendList);//remove last item in LL(latest message) and store latest in message
         message = List_trim(sendList);
         pthread_mutex_unlock(&sendListMutex);
-
         // If the list is empty (message is NULL)
         if(message == NULL) {
             sleep(1);//wait before checking again (avoid busy-wait)
             continue;
         }
 
+        if(strcmp(message, "!\n") == 0){
+            socket_send(ip_address, port, message);
+            threads_shutdown();
+            break;
+        }
         // printf("Message: %s\n", message);
-        printf("Sending message \"%s \"to %s:%d\n",message, ip_address, port);
+        // printf("Sending message \"%s \"to %s:%d\n",message, ip_address, port);
         //shoot message with socket_send
         socket_send(ip_address, port, message);
     }
@@ -86,7 +92,12 @@ void* receive_thread_func(void* threadarg) {
             pthread_mutex_lock(&receriveListMutex);
             char * storedMessage = strdup(message);//help protect against unexpected overwrites
 
-            printf("Received message\n");
+            // printf("Received message\n");
+            if(strcmp(storedMessage, "!\n") == 0){
+                
+                threads_shutdown();
+                break;
+            }
             //insert the message into the list
             List_prepend(receiveList, storedMessage);
             //free original message
