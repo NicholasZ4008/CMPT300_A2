@@ -14,6 +14,10 @@ struct ThreadInfo_S{
     int port;
 };
 
+void threads_shutdown();
+
+void threads_init(int port, int remotePort, char* remoteIp, List* inputList, List* outputList);
+
 void* keyboard_input_func(void* threadarg);
 
 void* send_thread_func(void* threadarg);
