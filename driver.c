@@ -38,11 +38,11 @@ void threads_init(int port, int remotePort, char* remoteIp, List* inputList, Lis
 }
 void threads_shutdown(){
     //Make threads stop working
+    printf("\nThreads have been shutdown.\n");
     pthread_cancel(screen_thread);
     pthread_cancel(receive_thread);
     pthread_cancel(keyboard_thread);
     pthread_cancel(send_thread);
-    printf("\nThreads have been shutdown.\n");
 }
 
 void freeItem(void* pItem){

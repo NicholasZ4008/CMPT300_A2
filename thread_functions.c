@@ -3,6 +3,49 @@
 pthread_mutex_t sendListMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t receriveListMutex = PTHREAD_MUTEX_INITIALIZER;
 
+static pthread_t screen_thread, receive_thread, keyboard_thread, send_thread;
+
+void threads_init(int port, int remotePort, char* remoteIp, List* inputList, List* outputList){
+    int screenret, receiveret;
+    int keyboardret, sendret;
+
+    //initializing input struct
+    //Input shared between screen and receive
+    pThreadD inputArgs;
+    inputArgs.sharedList = inputList;
+    inputArgs.port = port;
+
+    //initializing output struct
+    //Output shared between keyboard and send
+    pThreadD outputArgs;
+    outputArgs.sharedList = outputList;
+    outputArgs.ip_address = remoteIp;
+    outputArgs.port = remotePort;
+
+    //"input" threads
+    screenret = pthread_create(&screen_thread, NULL, screen_output_func, &inputArgs);
+    receiveret = pthread_create(&receive_thread, NULL, receive_thread_func, &inputArgs);
+
+    //"output" threads
+    keyboardret = pthread_create(&keyboard_thread, NULL, keyboard_input_func, &outputArgs);
+    sendret = pthread_create(&send_thread, NULL, send_thread_func, &outputArgs);
+    
+    // //Let threads finish their last task
+    pthread_join(screen_thread, NULL);
+    pthread_join(receive_thread, NULL);
+    pthread_join(keyboard_thread, NULL);
+    pthread_join(send_thread, NULL);
+}
+
+void threads_shutdown(){
+    //Make threads stop working
+    printf("\nThreads have been shutdown.\n");
+    pthread_cancel(screen_thread);
+    pthread_cancel(receive_thread);
+    pthread_cancel(keyboard_thread);
+    pthread_cancel(send_thread);
+}
+
 //read from user input and insert into list
 void* keyboard_input_func(void* threadarg){
     //wrap threadarg with struct to pass in List
