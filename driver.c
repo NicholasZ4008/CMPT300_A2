@@ -18,7 +18,6 @@ int main(int argc, char* argv[]){
     }
 
     //input values into myPort and remotePort through the command-line
-
     int myPort = atoi(argv[1]);
     char* remoteMachineName = argv[2];
     int remotePort = atoi(argv[3]);
@@ -27,18 +26,14 @@ int main(int argc, char* argv[]){
     char remote_ip[100];
     hostname_to_ip(remoteMachineName, remote_ip); //new ip address stored in remote_ip
 
-
     List* inputList = List_create();
     List* outputList = List_create();
     FREE_FN funcPointer = &freeItem;
 
     threads_init(myPort, remotePort, remote_ip, inputList, outputList);
 
-    printf("Finished closing all threads\n");
-
     List_free(outputList, funcPointer);
     List_free(inputList, funcPointer);
-    printf("Finished freeing the lists\n");
 
     exit(0);
 }

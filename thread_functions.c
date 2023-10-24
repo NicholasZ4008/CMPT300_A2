@@ -22,6 +22,9 @@ void threads_init(int port, int remotePort, char* remoteIp, List* inputList, Lis
     outputArgs.ip_address = remoteIp;
     outputArgs.port = remotePort;
 
+    printf("Listening on UDP port: %d\n\n", port);
+
+
     //"input" threads
     screenret = pthread_create(&screen_thread, NULL, screen_output_func, &inputArgs);
     receiveret = pthread_create(&receive_thread, NULL, receive_thread_func, &inputArgs);
@@ -43,7 +46,6 @@ void threads_shutdown(){
     pthread_cancel(receive_thread);
     pthread_cancel(keyboard_thread);
     pthread_cancel(send_thread);
-    printf("\nThreads have been shutdown.\n");
 }
 
 //read from user input and insert into list
@@ -55,21 +57,14 @@ void* keyboard_input_func(void* threadarg){
     char input[1024];//message buffer
 
     while(1) {
-        printf("Type your message then press Enter\n");
+        printf("Type your message then press enter: ");
 
         if(fgets(input, sizeof(input), stdin) != NULL) {            
             if(strcmp(input, "\n") == 0) {//if nothing is typed and enter is pressed, break loop
                 printf("Nothing typed\n");
                 break;
             }
-            // if(strcmp(input, "!\n") == 0){
-            //     printf("Exiting program\n");
-            //     pthread_mutex_lock(&sendListMutex);
-            //     void* empty;
-            //     pthread_mutex_unlock(&sendListMutex);
-            //     threads_shutdown();
-            //     break;
-            // }
+
             pthread_mutex_lock(&sendListMutex);
             List_prepend(sendList, input);//insert entered item into input
             pthread_mutex_unlock(&sendListMutex);
@@ -79,7 +74,6 @@ void* keyboard_input_func(void* threadarg){
             perror("Error reading input");
         }
     }
-    printf("Exit keyboard thread");
     return NULL;
 }
 
@@ -96,8 +90,6 @@ void* send_thread_func(void* threadarg) {
     while(1) { 
         pthread_mutex_lock(&sendListMutex);
         //pick message from list
-        // List_first(sendList);//go to last item to retrieve latest message due to list_prepend
-        // message = List_remove(sendList);//remove last item in LL(latest message) and store latest in message
         message = List_trim(sendList);
         pthread_mutex_unlock(&sendListMutex);
         // If the list is empty (message is NULL)
@@ -111,12 +103,9 @@ void* send_thread_func(void* threadarg) {
             threads_shutdown();
             break;
         }
-        // printf("Message: %s\n", message);
-        // printf("Sending message \"%s \"to %s:%d\n",message, ip_address, port);
         //shoot message with socket_send
         socket_send(ip_address, port, message);
     }
-    printf("Exit send thread\n");
     return NULL;
 }
 
@@ -135,7 +124,6 @@ void* receive_thread_func(void* threadarg) {
             pthread_mutex_lock(&receriveListMutex);
             char * storedMessage = strdup(message);//help protect against unexpected overwrites
 
-            // printf("Received message\n");
             if(strcmp(storedMessage, "!\n") == 0){
                 
                 threads_shutdown();
@@ -150,7 +138,6 @@ void* receive_thread_func(void* threadarg) {
             sleep(1);//avoid busy-wait
         }
     }
-    printf("exit recv thread\n");
     return NULL;
 }
 
@@ -163,8 +150,6 @@ void* screen_output_func(void* threadarg){
     while(1){
         pthread_mutex_lock(&receriveListMutex);
         //pick messages from list
-        // List_last(receiveList);
-        // message = List_remove(receiveList);
         message = List_trim(receiveList);
         pthread_mutex_unlock(&receriveListMutex);
 
@@ -174,9 +159,8 @@ void* screen_output_func(void* threadarg){
         }
         
         //write on console
-        printf("%s\n", message);
+        printf("\nMessage received: %s", message);
         free(message);
     }
-    printf("Exit screen output\n");
     return NULL;
 }

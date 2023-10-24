@@ -65,10 +65,7 @@ int socket_send(const char* dest_ip, int dest_port, const char* message) {
 }
 
 //opens receive socket at host_port
-//isn't finished
 char* socket_receive(int host_port){
-    printf("Net listen test on UDP port: %d\n\n", host_port);
-
     struct sockaddr_in sin; 
     memset(&sin, 0, sizeof(sin));
 
