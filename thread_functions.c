@@ -26,7 +26,6 @@ void threads_init(int port, int remotePort, char* remoteIp, List* inputList, Lis
 
     printf("Listening on UDP port: %d\n\n", port);
 
-
     //"input" threads
     screenret = pthread_create(&screen_thread, NULL, screen_output_func, &inputArgs);
     receiveret = pthread_create(&receive_thread, NULL, receive_thread_func, &inputArgs);
@@ -59,13 +58,9 @@ void* keyboard_input_func(void* threadarg){
     char input[1024];//message buffer
 
     while(1) {
-        printf("Type your message then press enter: ");
+        fputs("Type your message then press enter: ", stdout);
 
         if(fgets(input, sizeof(input), stdin) != NULL) {            
-            // if(strcmp(input, "\n") == 0) {//if nothing is typed and enter is pressed, break loop
-            //     printf("Nothing typed\n");
-            //     break;
-            // }
 
             pthread_mutex_lock(&sendListMutex);
             List_prepend(sendList, input);//insert entered item into input
@@ -174,7 +169,8 @@ void* screen_output_func(void* threadarg){
         }
         
         //write on console
-        printf("\nMessage received: %s", message);
+        fputs("\nMessage received: ", stdout);
+        fputs(message, stdout);
         free(message);
     }
     return NULL;
