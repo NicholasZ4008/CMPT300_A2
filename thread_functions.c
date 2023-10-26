@@ -1,7 +1,9 @@
 #include "thread_functions.h"
 
 pthread_mutex_t sendListMutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t receriveListMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t receiveListMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t inputListNotEmpty = PTHREAD_COND_INITIALIZER;
+pthread_cond_t outputListNotEmpty = PTHREAD_COND_INITIALIZER;
 
 static pthread_t screen_thread, receive_thread, keyboard_thread, send_thread;
 
@@ -60,13 +62,14 @@ void* keyboard_input_func(void* threadarg){
         printf("Type your message then press enter: ");
 
         if(fgets(input, sizeof(input), stdin) != NULL) {            
-            if(strcmp(input, "\n") == 0) {//if nothing is typed and enter is pressed, break loop
-                printf("Nothing typed\n");
-                break;
-            }
+            // if(strcmp(input, "\n") == 0) {//if nothing is typed and enter is pressed, break loop
+            //     printf("Nothing typed\n");
+            //     break;
+            // }
 
             pthread_mutex_lock(&sendListMutex);
             List_prepend(sendList, input);//insert entered item into input
+            pthread_cond_signal(&outputListNotEmpty);
             pthread_mutex_unlock(&sendListMutex);
 
         } 
@@ -90,6 +93,11 @@ void* send_thread_func(void* threadarg) {
     while(1) { 
         pthread_mutex_lock(&sendListMutex);
         //pick message from list
+
+        while(List_count(sendList) == 0){
+            pthread_cond_wait(&outputListNotEmpty, &sendListMutex);
+        }
+
         message = List_trim(sendList);
         pthread_mutex_unlock(&sendListMutex);
         // If the list is empty (message is NULL)
@@ -121,19 +129,21 @@ void* receive_thread_func(void* threadarg) {
         message = socket_receive(port);
 
         if(message){//if message exists
-            pthread_mutex_lock(&receriveListMutex);
             char * storedMessage = strdup(message);//help protect against unexpected overwrites
 
             if(strcmp(storedMessage, "!\n") == 0){
-                
+                free(message);
+                free(storedMessage);
                 threads_shutdown();
                 break;
             }
+            pthread_mutex_lock(&receiveListMutex);
             //insert the message into the list
             List_prepend(receiveList, storedMessage);
+            pthread_cond_signal(&inputListNotEmpty);
             //free original message
             free(message);
-            pthread_mutex_unlock(&receriveListMutex);
+            pthread_mutex_unlock(&receiveListMutex);
         }else{
             sleep(1);//avoid busy-wait
         }
@@ -148,10 +158,15 @@ void* screen_output_func(void* threadarg){
     char* message;
 
     while(1){
-        pthread_mutex_lock(&receriveListMutex);
+        pthread_mutex_lock(&receiveListMutex);
+
+        while(List_count(receiveList) == 0){
+            pthread_cond_wait(&inputListNotEmpty, &receiveListMutex);
+        }
+        
         //pick messages from list
         message = List_trim(receiveList);
-        pthread_mutex_unlock(&receriveListMutex);
+        pthread_mutex_unlock(&receiveListMutex);
 
         if(message == NULL) {
             sleep(1);//wait before checking again (avoid busy-wait)
